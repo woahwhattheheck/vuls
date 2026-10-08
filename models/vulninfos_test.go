@@ -591,6 +591,28 @@ func TestCvss2Scores(t *testing.T) {
 				},
 			},
 		},
+		// Cisco CVRF/CSAF CVSS v2 data participates in score aggregation.
+		{
+			in: VulnInfo{
+				CveContents: CveContents{
+					Cisco: []CveContent{{
+						Type:          Cisco,
+						Cvss2Severity: "HIGH",
+						Cvss2Score:    7.5,
+						Cvss2Vector:   "AV:N/AC:L/Au:N/C:P/I:P/A:P",
+					}},
+				},
+			},
+			out: []CveContentCvss{{
+				Type: Cisco,
+				Value: Cvss{
+					Type:     CVSS2,
+					Score:    7.5,
+					Vector:   "AV:N/AC:L/Au:N/C:P/I:P/A:P",
+					Severity: "HIGH",
+				},
+			}},
+		},
 		// Empty
 		{
 			in:  VulnInfo{},
@@ -2241,6 +2263,33 @@ func TestVulnInfo_Cvss40Scores(t *testing.T) {
 						Score:    6.9,
 						Severity: "MEDIUM",
 						Vector:   "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X",
+					},
+				},
+			},
+		},
+		{
+			name: "cisco",
+			fields: fields{
+				CveID: "CVE-2019-1688",
+				CveContents: CveContents{
+					Cisco: []CveContent{
+						{
+							Type:           Cisco,
+							Cvss40Score:    7.7,
+							Cvss40Vector:   "CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:H/SC:N/SI:N/SA:N",
+							Cvss40Severity: "HIGH",
+						},
+					},
+				},
+			},
+			want: []CveContentCvss{
+				{
+					Type: Cisco,
+					Value: Cvss{
+						Type:     CVSS40,
+						Score:    7.7,
+						Severity: "HIGH",
+						Vector:   "CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:H/SC:N/SI:N/SA:N",
 					},
 				},
 			},
